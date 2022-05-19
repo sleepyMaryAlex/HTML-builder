@@ -8,29 +8,30 @@ const rl = readline.createInterface({
 });
 
 function fileHandler() {
-  fs.open('02-write-file/text.txt', 'a+', textHandler);
+  fs.open(path.resolve('02-write-file', 'text.txt'), 'a+', textHandler);
 }
 fileHandler();
 
 let fileContent = '';
 let message = 'Hello, write some text, please!\n';
+
 function textHandler() {
   rl.question(message, (answer) => {
     if (answer !== 'exit') {
       message = '';
-      fs.writeFile('02-write-file/text.txt', fileContent + answer, (err) => {
+      fs.writeFile(path.resolve('02-write-file', 'text.txt'), fileContent + answer, (err) => {
         if (err) throw err;
         fileContent += answer + '\n';
       });
       textHandler();
     } else {
-      console.log('Thank you :) Have a nice day!');
+      console.log('Thank you. Have a nice day!');
       rl.close();
     }
   });
 }
 
 rl.on('SIGINT', () => {
-  console.log('Thank you :) Have a nice day!');
+  console.log('Thank you. Have a nice day!');
   rl.close();
 });
