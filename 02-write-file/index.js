@@ -17,7 +17,7 @@ let message = 'Hello, write some text, please!\n';
 
 function textHandler() {
   rl.question(message, (answer) => {
-    if (answer !== 'exit') {
+    if (answer.trim() !== 'exit') {
       message = '';
       fs.writeFile(path.resolve('02-write-file', 'text.txt'), fileContent + answer, (err) => {
         if (err) throw err;
