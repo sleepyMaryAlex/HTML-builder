@@ -1,14 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// create folder project-dist
-
 async function createOutputFolder() {
   const folderPath = path.resolve('06-build-page', 'project-dist');
   await fs.promises.mkdir(folderPath, { recursive: true });
 }
-
-// check if index.html exists and remove
 
 async function removeFile(file) {
   const filePath = path.resolve('06-build-page', 'project-dist', file);
@@ -17,8 +13,6 @@ async function removeFile(file) {
     await fs.promises.unlink(filePath);
   }
 }
-
-// add index.html
 
 async function createHTML() {
   const templatePath = path.resolve('06-build-page', 'template.html');
@@ -40,11 +34,8 @@ async function createHTML() {
   }
 
   const htmlPath = path.resolve('06-build-page', 'project-dist', 'index.html');
-  await fs.promises.open(htmlPath, 'w');
   await fs.promises.appendFile(htmlPath, template);
 }
-
-// add file style.css
 
 async function createCSS() {
   const stylesPath = path.resolve('06-build-page', 'styles');
@@ -62,8 +53,6 @@ async function createCSS() {
   }
 }
 
-// remove assets
-
 async function removeFiles(folderPath) {
   const elements = await fs.promises.readdir(folderPath);
   for (let element of elements) {
@@ -77,8 +66,6 @@ async function removeFiles(folderPath) {
     }
   }
 }
-
-// copy assets folder
 
 async function copyDir(sourceFolderPath, targetFolderPath) {
   await fs.promises.mkdir(targetFolderPath, { recursive: true });
