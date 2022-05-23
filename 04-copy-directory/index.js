@@ -1,44 +1,35 @@
 const fs = require('fs');
 const path = require('path');
 
+const sourcePath = path.resolve('04-copy-directory', 'files');
+const targetPath = path.resolve('04-copy-directory', 'files-copy');
+
 async function removeFolder(path) {
   const files = await fs.promises.readdir(path);
   for (let file of files) {
-    fs.unlink(`04-copy-directory/files-copy/${file}`, (err) => {
-      if (err) throw err;
-    });
+    await fs.promises.unlink(`${targetPath}/${file}`);
   }
 }
 
 async function copyDir(pathFolder) {
-  try {
-    fs.mkdir(
-      path.resolve('04-copy-directory', 'files-copy'),
-      { recursive: true },
-      (err) => {
-        if (err) throw err;
-        console.log('Copied successfully');
-      }
-    );
+  await fs.promises.mkdir(targetPath, { recursive: true });
+  console.log('Copied successfully');
 
-    const files = await fs.promises.readdir(pathFolder);
-    for (let file of files) {
-      fs.copyFile(
-        path.resolve('04-copy-directory', 'files', `${file}`),
-        path.resolve('04-copy-directory', 'files-copy', `${file}`),
-        (err) => {
-          if (err) throw err;
-        }
-      );
-    }
-  } catch (err) {
-    console.log(err);
+  const files = await fs.promises.readdir(pathFolder);
+  for (let file of files) {
+    await fs.promises.copyFile(
+      `${sourcePath}/${file}`,
+      `${targetPath}/${file}`
+    );
   }
 }
 
-fs.stat(path.resolve('04-copy-directory', 'files-copy'), (err) => {
-  if (!err) {
-    removeFolder(path.resolve('04-copy-directory', 'files-copy'));
+async function runFunctions() {
+  const stat = await fs.promises.stat(targetPath).catch(() => null);
+  if (stat) {
+    await removeFolder(targetPath);
   }
-  copyDir(path.resolve('04-copy-directory', 'files'));
-});
+  await copyDir(sourcePath);
+}
+
+runFunctions();
