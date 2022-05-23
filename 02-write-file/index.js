@@ -7,31 +7,37 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-function fileHandler() {
-  fs.open(path.resolve('02-write-file', 'text.txt'), 'a+', textHandler);
-}
-fileHandler();
-
-let fileContent = '';
-let message = 'Hello, write some text, please!\n';
-
-function textHandler() {
-  rl.question(message, (answer) => {
-    if (answer.trim() !== 'exit') {
-      message = '';
-      fs.writeFile(path.resolve('02-write-file', 'text.txt'), fileContent + answer, (err) => {
-        if (err) throw err;
-        fileContent += answer + '\n';
-      });
-      textHandler();
-    } else {
-      console.log('Thank you. Have a nice day!');
-      rl.close();
-    }
+async function getAnswer() {
+  return new Promise((resolve) => {
+    rl.question('', (answer) => {
+      resolve(answer);
+    });
   });
 }
 
-rl.on('SIGINT', () => {
-  console.log('Thank you. Have a nice day!');
+async function writeToFile(filePath) {
+  let answer = await getAnswer();
+  while (answer.trim() !== 'exit') {
+    await fs.promises.appendFile(filePath, answer + '\n');
+    answer = await getAnswer();
+  }
+  rl.write('Thank you. Have a nice day!');
   rl.close();
-});
+}
+
+async function processFile() {
+  rl.on('SIGINT', () => {
+    rl.write('Thank you. Have a nice day!');
+    rl.close();
+  });
+  rl.write('Hello, write some text, please!' + '\n');
+  const filePath = path.resolve('02-write-file', 'text.txt');
+  const stat = await fs.promises.stat(filePath).catch(() => null);
+  if (stat) {
+    await fs.promises.unlink(filePath);
+  }
+  await fs.promises.open(filePath, 'a+');
+  await writeToFile(filePath);
+}
+
+processFile();
